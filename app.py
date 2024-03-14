@@ -51,7 +51,6 @@ def create_map(df, location, zoom_start):
                 st.error(f"Error parsing geolocation for row {idx}: {row['geolocation']}")
     return m
 
-# 新脚本的函数，稍作修改以适应现有的数据库架构
 def init_db():
     conn = sqlite3.connect('event_planner.db')
     c = conn.cursor()
@@ -129,21 +128,16 @@ def main():
 
     st.write("Chat with AI")
 
-    # 初始化对话历史
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    # 初始化或更新输入标记
     if 'input_flag' not in st.session_state:
         st.session_state.input_flag = True
 
-    # 生成唯一的 key 值用于 text_input，以便在需要时重置输入框
     input_key = 'prompt' if st.session_state.input_flag else 'prompt_'
 
-    # 用户输入问题
     prompt = st.text_input("Your question", value="", key=input_key)
 
-    # 提交按钮
     submit_button = st.button("Ask")
 
     if submit_button and prompt:
@@ -156,17 +150,14 @@ def main():
             )
         
             answer = response.choices[0].message['content']
-        
-            # 将 AI 回答添加到会话历史中
+
             st.session_state.messages.append({"role": "assistant", "content": answer})
         
         except Exception as e:
             st.error(f"Failed to generate a response: {e}")
-    
-        # 通过改变输入标记和输入框的 key 来重置文本输入框
+
         st.session_state.input_flag = not st.session_state.input_flag
 
-    # 显示对话历史
     for message in st.session_state.messages:
         role = "You" if message["role"] == "user" else "AI"
         st.text_area(f"{role}:", value=message['content'], height=100, key=str(message)+str(st.session_state.messages.index(message)))
